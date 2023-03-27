@@ -22,20 +22,20 @@ def login_page(user, password):
 
     # wait for the inventory page to appear
     try:
-        WebDriverWait(driver, 1).until(EC.presence_of_element_located((
+        WebDriverWait(driver, 2).until(EC.presence_of_element_located((
             By.CLASS_NAME, "shopping_cart_container")))
     except TimeoutException:
         print("Login took too long!")
-        if driver.find_element(By.CLASS_NAME, 'error'):
-            # validate error and close it
-            WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.CLASS_NAME, 'error')))
-            assert driver.find_element(By.XPATH, "//h3[@data-test='error']").text == "Epic sadface: Sorry, this user " \
-                                                                                     "has been locked out."
-            print("User \'" + user + "\' couldn\'t log in")
-            driver.find_element(By.CLASS_NAME, "error-button").click()
-        return
     # validate successful login
-    assert "https://www.saucedemo.com/inventory.html" in driver.current_url
+    try:
+        assert "https://www.saucedemo.com/inventory.html" in driver.current_url
+    except AssertionError:
+        # validate error and close it
+        WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.CLASS_NAME, 'error')))
+        assert driver.find_element(By.XPATH, "//h3[@data-test='error']").text == "Epic sadface: Sorry, this user " \
+                                                                                 "has been locked out."
+        print("User \'" + user + "\' couldn\'t log in")
+        driver.find_element(By.CLASS_NAME, "error-button").click()
 
 
 # Function: log out from the page
